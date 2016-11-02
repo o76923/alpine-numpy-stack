@@ -26,5 +26,5 @@ RUN export NPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) \
     && python -q setup.py build -j ${NPROC} --fcompiler=gfortran install \
     && cd /tmp \
     && rm -r numpy-$NUMPY_VERSION \
-    && pip install numexpr pandas \
+    && pip install numexpr pandas scipy \
     && apk --no-cache del --purge build-deps
