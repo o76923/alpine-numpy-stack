@@ -8,7 +8,8 @@ RUN echo "http://alpine.gliderlabs.com/alpine/v3.4/main" > /etc/apk/repositories
     && echo "@edge http://alpine.gliderlabs.com/alpine/edge/community" >> /etc/apk/repositories \
     && apk --no-cache add openblas-dev@edge
 
-RUN apk --no-cache add --virtual build-deps \
+RUN export NPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) \
+    && apk --no-cache add --virtual build-deps \
         musl-dev \
         linux-headers \
         g++ \
@@ -22,7 +23,7 @@ RUN apk --no-cache add --virtual build-deps \
     && cd numpy-$NUMPY_VERSION/ \
     && cp site.cfg.example site.cfg \
     && echo -en "\n[openblas]\nlibraries = openblas\nlibrary_dirs = /usr/lib\ninclude_dirs = /usr/include\n" >> site.cfg \
-    && python -q setup.py build -j 20 --fcompiler=gfortran install \
+    && python -q setup.py build -j ${NPROC} --fcompiler=gfortran install \
     && cd /tmp \
     && rm -r numpy-$NUMPY_VERSION \
     && pip install numexpr pandas \
